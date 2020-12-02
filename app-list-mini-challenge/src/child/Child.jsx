@@ -18,7 +18,7 @@ class Child extends Component {
 
             priceData = this.props.data.subscriptions.map((item, index) => {
         
-            return  <li><span>{item.name}</span> <h3>{item.price === 0 ? "Free" : item.price}<sup>€</sup></h3></li>
+            return  <li><span>{item.name}</span> <h3>{item.price === 0 ? "Free" : item.price}<sup>{item.price === 0 ? "" : "€"}</sup></h3></li>
         })}
         return(
             <ul>
