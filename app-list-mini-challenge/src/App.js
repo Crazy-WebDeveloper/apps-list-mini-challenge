@@ -42,7 +42,7 @@ class App extends Component {
     const sorted_menu_data = this.state.menuList.slice();
     sorted_menu_data.sort();
     const menu_data = sorted_menu_data.map((item, index) => {
-      return <li><a href="#" onClick={() => this.onMenuClicked(item)}>{item}</a></li>
+      return <li key={index}><a href="#" key={index} onClick={() => this.onMenuClicked(item)}>{item}</a></li>
     })
     /*-- All categories in the left menu are sorted by ascending order --*/
 
@@ -80,7 +80,7 @@ class App extends Component {
     let childData = []
     if (view_data) {
       childData = DataAry.map((item, index) => {
-        return <Child data={item} category={this.props.selectedMenuId} id={item.id}></Child>
+        return <Child data={item} category={this.props.selectedMenuId} key={item.id}></Child>
       })
     }
     /*-- configure app data which display --*/
@@ -90,26 +90,26 @@ class App extends Component {
     const pageSecionData = [];
 
     for (let i = 0; i < pageCount; i++) {
-      const p = <li><a href="#" onClick={() => this.onChangePagenation(i + 1)}>{i + 1}</a></li>
+      const p = <li key={i}><a href="#" key={i} onClick={() => this.onChangePagenation(i + 1)}>{i + 1}</a></li>
       pageSecionData.push(p);
     }
     /*-- configure pageNate data --*/
 
     return (
-      <div class="flex-container">
-        <nav class="nav-categories">
+      <div className="flex-container">
+        <nav className="nav-categories">
           <h2>Categories</h2>
 
-          <ul class="nav-menu">
+          <ul className="nav-menu">
             {menu_data}
           </ul>
         </nav>
-        <section class="apps-list">
+        <section className="apps-list">
           <header>
             <input type="text" placeholder="Search by App" onChange={this.onSearchFiltering} />
           </header>
           {this.props.childList ? childData : []}
-          <ul class="pagination">
+          <ul className="pagination">
             <li><a href="#" onClick={() => this.onChangePagenation("left")}>&lt;</a></li>
             {pageSecionData}
             <li><a href="#" onClick={() => this.onChangePagenation("right")}>&gt;</a></li>
