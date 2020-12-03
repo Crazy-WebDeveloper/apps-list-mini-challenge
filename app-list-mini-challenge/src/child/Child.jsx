@@ -14,8 +14,14 @@ class Child extends Component {
     render() {
 
         let priceData = [];
+        let categoryData = "";
         if(this.props.data){
-
+            const categoryList = this.props.data.categories;
+            categoryList.sort();
+            for(let i = 0; i < categoryList.length; i++) {
+                if(i === 0) categoryData = categoryList[i];
+                else categoryData += "/" + categoryList[i];  
+            }
             priceData = this.props.data.subscriptions.map((item, index) => {
         
             return  <li><span>{item.name}</span> <h3>{item.price === 0 ? "Free" : item.price}<sup>{item.price === 0 ? "" : "€"}</sup></h3></li>
@@ -30,7 +36,7 @@ class Child extends Component {
                                     <h1>{this.props.data ? this.props.data.name : ""}</h1>
                                     <p>{this.props.data ? this.props.data.description : ""}</p>
                                 </div>
-                                <div class="tags"><span>{this.props.category ? this.props.category : ""}</span></div>
+                                <div class="tags"><span>{categoryData}</span></div>
                             </div>
                             <div class="box-info--footer">
                                 <ul>

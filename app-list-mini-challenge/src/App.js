@@ -1,10 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import { connect } from 'react-redux';
 import * as actions from './actions';
 import Child from './child/Child';
-
-// import NewTodo from '../components/NewTodo';
 import React, { Component } from 'react';
 
 class App extends Component {
@@ -14,113 +11,116 @@ class App extends Component {
     this.onMenuClicked = this.onMenuClicked.bind(this);
     this.onChangePagenation = this.onChangePagenation.bind(this);
     this.state = {
-      menuList : ["Channels", "Dialer", "Optimization", "Reporting", "Voice Analytics"],
-      childList : [],
-      seletedMenuId : "Channels"
+      menuList: ["Channels", "Optimization", "Reporting", "Dialer", "Voice Analytics"],
+      childList: [],
     }
   }
   componentDidMount() {
-    this.props.fetchData(this.state.menuList[0], null);
+    this.props.fetchAllData(); // when enter the first page, all apps is displayed.
   }
-  componentWillUpdate(props, state) {
-    console.log("<>", props);
 
+  onChangePagenation(e) { // when pageNate changed, it occurs
+    if (this.props.page_num === Math.ceil(this.props.childList.length / 3) && e === "right") return; //return when page number is last and click right arrow button
+    if (this.props.page_num === 1 && e === "left") return; // return when page number is first and click left arrow button
+    if (this.props.page_num === 0 && e === "left") return; //return when enter the first and click left arrow button
+    if (e === "right") this.props.setPageNum(this.props.page_num + 1);
+    else if (e === "left") this.props.setPageNum(this.props.page_num - 1)
+    else this.props.setPageNum(e);
   }
-  
-  onChangePagenation(e) {
-   if(this.props.page_num === Math.ceil(this.props.childList.length / 3) && e === "right") return;
-   if(this.props.page_num === Math.ceil(this.props.childList.length / 3) && e === "left") return;
-   if(this.props.page_num === 0 && e === "left") return;
-   if(e === "right") this.props.setPageNum(this.props.page_num + 1);
-   else if(e === "left") this.props.setPageNum(this.props.page_num - 1)
-   else this.props.setPageNum(e);
-  }
-  onSearchFiltering(e) {
+  onSearchFiltering(e) { //when filter apps by input data
     let fil_val = e.target.value;
-  
+
     this.props.fetchData(this.props.selectedMenuId, fil_val);
   }
-  onMenuClicked(e) {
+  onMenuClicked(e) { // when click left menu list
+    
     this.props.fetchData(e, null)
   }
   render() {
 
-    const menu_data = this.state.menuList.map((item, index) => {
-      return <li class={index === 0 ? "active" : ""}><a href="#" onClick={() => this.onMenuClicked(item)}>{item}</a></li>
+    /*-- Category List Section. All categories in the left menu are sorted by ascending order --*/
+    const sorted_menu_data = this.state.menuList.slice();
+    sorted_menu_data.sort();
+    const menu_data = sorted_menu_data.map((item, index) => {
+      return <li><a href="#" onClick={() => this.onMenuClicked(item)}>{item}</a></li>
     })
+    /*-- All categories in the left menu are sorted by ascending order --*/
+
+    /*-- extract 3 apps which have to display by page number --*/
     let tmp = this.props.childList.slice();
     let view_data = [];
-    for(let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       let pgNum = Number(this.props.page_num);
-      if(pgNum === 0) pgNum++;
-      if(tmp[i + (pgNum-1)*3])
-      view_data.push(tmp[i + (pgNum-1)*3])
+      if (pgNum === 0) pgNum++;
+      if (tmp[i + (pgNum - 1) * 3])
+        view_data.push(tmp[i + (pgNum - 1) * 3])
     }
-    console.log("<>", view_data);
+    /*-- extract 3 apps which have to display by page number --*/
     
+    /*-- sort by ascending order of the sum of the plans price --*/
     let temp_ary = [];
-    for(let i = 0 ; i < view_data.length; i++) {
+    for (let i = 0; i < view_data.length; i++) {
       let sum = 0;
       let a = {};
-      for(let j = 0 ; j < view_data[i].subscriptions.length ; j++) {
+      for (let j = 0; j < view_data[i].subscriptions.length; j++) {
         sum += view_data[i].subscriptions[j].price;
       }
       a.order = i;
       a.sum = sum;
-      temp_ary.push(a);  
+      temp_ary.push(a);
     }
-    temp_ary.sort(function(a, b) { return a.sum - b.sum });
+    temp_ary.sort(function (a, b) { return a.sum - b.sum });
     let DataAry = [];
-    for( let i = 0; i < temp_ary.length ; i++ ) {
+    for (let i = 0; i < temp_ary.length; i++) {
       DataAry.push(view_data[temp_ary[i].order]);
     }
+    /*-- sort by ascending order of the sum of the plans price --*/
+
+    /*-- configure app data which display --*/
     let childData = []
-    if(view_data) {
+    if (view_data) {
       childData = DataAry.map((item, index) => {
-        return <Child data={item} category={this.props.selectedMenuId}></Child>
-    })}
+        return <Child data={item} category={this.props.selectedMenuId} id={item.id}></Child>
+      })
+    }
+    /*-- configure app data which display --*/
+
+    /*-- configure pageNate data --*/
     const pageCount = Math.ceil(this.props.childList.length / 3);
     const pageSecionData = [];
-    
-    for(let i = 0 ; i < pageCount; i++) {
-      const p = <li><a href="#" onClick={() => this.onChangePagenation(i+1)}>{i+1}</a></li>
+
+    for (let i = 0; i < pageCount; i++) {
+      const p = <li><a href="#" onClick={() => this.onChangePagenation(i + 1)}>{i + 1}</a></li>
       pageSecionData.push(p);
     }
-    
+    /*-- configure pageNate data --*/
+
     return (
       <div class="flex-container">
         <nav class="nav-categories">
-        <h2>Categories</h2>
+          <h2>Categories</h2>
 
-        <ul class="nav-menu">
-          {menu_data}
-        </ul>
-      </nav>
-      <section class="apps-list">
-        <header>
-          <input type="text" placeholder="Search by App" onChange={this.onSearchFiltering}/>
-        </header>
-        {this.props.childList ? childData : []}
-        <ul class="pagination">
-          <li><a href="#" onClick={() => this.onChangePagenation("left")}>&lt;</a></li>
-          {pageSecionData}
-          <li><a href="#" onClick={() => this.onChangePagenation("right")}>&gt;</a></li>
-        </ul>
+          <ul class="nav-menu">
+            {menu_data}
+          </ul>
+        </nav>
+        <section class="apps-list">
+          <header>
+            <input type="text" placeholder="Search by App" onChange={this.onSearchFiltering} />
+          </header>
+          {this.props.childList ? childData : []}
+          <ul class="pagination">
+            <li><a href="#" onClick={() => this.onChangePagenation("left")}>&lt;</a></li>
+            {pageSecionData}
+            <li><a href="#" onClick={() => this.onChangePagenation("right")}>&gt;</a></li>
+          </ul>
         </section>
       </div>
     )
   }
 }
 
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     onAddTodo: todo => {
-//       dispatch(addTodo(todo));
-//     }
-//   };
-// };
 const mapStateToProps = (state) => {
-  console.log("<>", state) // state
   return {
     childList: state.fetchDataReducer.fetch_data ? state.fetchDataReducer.fetch_data : [],
     page_num: state.fetchDataReducer.page_num > 0 ? state.fetchDataReducer.page_num : 1,
