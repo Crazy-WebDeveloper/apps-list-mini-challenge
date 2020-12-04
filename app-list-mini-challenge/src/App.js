@@ -33,14 +33,15 @@ class App extends Component {
     this.props.fetchData(this.props.selectedMenuId, fil_val);
   }
   onMenuClicked(e) { // when click left menu list
-    
-    this.props.fetchData(e, null)
+    if(e === "All") this.props.fetchAllData(); // when clicked "All" button
+    else this.props.fetchData(e, null) // when clicked categories button
   }
   render() {
 
     /*-- Category List Section. All categories in the left menu are sorted by ascending order --*/
     const sorted_menu_data = this.state.menuList.slice();
     sorted_menu_data.sort();
+    sorted_menu_data.unshift("All"); // view All apps.
     const menu_data = sorted_menu_data.map((item, index) => {
       return <li key={index}><a href="#" key={index} onClick={() => this.onMenuClicked(item)}>{item}</a></li>
     })
